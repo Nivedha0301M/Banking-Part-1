@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Bank Exam Quiz</title>
+
+<style>
+
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f6f9;
+    margin:0;
+    padding:20px;
+}
+
+.container{
+    max-width:1000px;
+    margin:auto;
+}
+
+h1{
+    text-align:center;
+}
+
+/* ========================= */
+/* TIMER AREA */
+/* ========================= */
+
+#timer-container{
+    position:sticky;
+    top:0;
+    z-index:100;
+    background:#f4f6f9;
+    padding-bottom:10px;
+}
+
+#timer{
+    background:#222;
+    color:white;
+    padding:15px;
+    text-align:center;
+    font-size:22px;
+    border-radius:10px;
+    margin-bottom:10px;
+}
+
+.timer-buttons{
+    text-align:center;
+}
+
+#pauseBtn,
+#resumeBtn{
+    padding:10px 20px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:16px;
+    margin:5px;
+}
+
+#pauseBtn{
+    background:#ff9800;
+    color:white;
+}
+
+#resumeBtn{
+    background:#28a745;
+    color:white;
+}
+
+.question{
+    background:white;
+    padding:20px;
+    margin-bottom:20px;
+    border-radius:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.question h3{
+    margin-bottom:15px;
+}
+
+.option{
+    display:block;
+    padding:12px;
+    margin:10px 0;
+    border:1px solid #ccc;
+    border-radius:8px;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.option:hover{
+    background:#f0f0f0;
+}
+
+.selected{
+    background:#cfe2ff;
+    border:2px solid #0d6efd;
+}
+
+.mark-btn{
+    margin-top:10px;
+    padding:8px 15px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    background:#ff9800;
+    color:white;
+}
+
+.marked{
+    background:#ffcc80 !important;
+}
+
+.review-marked{
+    background:#e0e0e0 !important;
+    border:2px solid #9e9e9e;
+}
+
+.clear-btn{
+    margin-top:10px;
+    margin-left:10px;
+    padding:8px 15px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    background:#dc3545;
+    color:white;
+}
+
+.submit-btn{
+    width:100%;
+    padding:15px;
+    font-size:20px;
+    border:none;
+    border-radius:10px;
+    background:#28a745;
+    color:white;
+    cursor:pointer;
+    margin-top:20px;
+}
+
+.result-box{
+    background:white;
+    padding:30px;
+    border-radius:12px;
+    text-align:center;
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+.review-btn{
+    padding:12px 20px;
+    margin-top:20px;
+    border:none;
+    border-radius:10px;
+    background:#007bff;
+    color:white;
+    font-size:18px;
+    cursor:pointer;
+}
+
+.review-question{
+    background:white;
+    padding:20px;
+    margin:20px 0;
+    border-radius:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.correct{
+    color:green;
+    font-weight:bold;
+}
+
+.wrong{
+    color:red;
+    font-weight:bold;
+}
+
+.unanswered{
+    color:orange;
+    font-weight:bold;
+}
+
+.correct-answer{
+    background:#d4edda;
+    padding:10px;
+    border-radius:8px;
+    margin-top:10px;
+}
+
+.disabled-option{
+    pointer-events:none;
+    opacity:0.6;
+}
+
+.disabled-btn{
+    opacity:0.6;
+    cursor:not-allowed;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Bank Exam MCQ Quiz</h1>
+
+<!-- ========================= -->
+<!-- TIMER -->
+<!-- ========================= -->
+
+<div id="timer-container">
+
+    <div id="timer">
+        Time Left: 20:00
+    </div>
+
+    <div class="timer-buttons">
+
+        <button id="pauseBtn" onclick="pauseTimer()">
+            Pause
+        </button>
+
+        <button id="resumeBtn" onclick="resumeTimer()" disabled>
+            Resume
+        </button>
+
+    </div>
+
+</div>
+
+<div id="quiz"></div>
+
+<button class="submit-btn" onclick="submitQuiz()">
+Submit Quiz
+</button>
+
+</div>
+
+<script>
+
+// ===============================
+// QUESTIONS AREA
+// ===============================
+
+const questions = [
+
+{q:"Bank of Baroda (BoB) has launched an industry-first AI-powered, in-house developed multilingual conversational platform to eliminate language barriers at branches. What is the name of this platform?", options:["bob SAARTHI","bob SAMVAD","bob SAMPARK","bob VANI"], answer:1},
+
+{q:"The AI-enabled multilingual platform ‘bob SAMVAD’ unveiled by Bank of Baroda (BoB) currently supports communication in how many Indian languages?", options:["18","20","22","24"], answer:2},
+
+{q:"During its initial implementation phase, Bank of Baroda’s AI-powered ‘bob SAMVAD’ platform will be rolled out across 250 branches located in how many Indian states?", options:["4","5","6","7"], answer:1},
+
+{q:"Which of the following combinations correctly represents all the states selected for the first phase rollout of Bank of Baroda’s ‘bob SAMVAD’ initiative?", options:["Tamil Nadu, Karnataka, Telangana, Andhra Pradesh and Maharashtra","Tamil Nadu, Kerala, Karnataka, Telangana and Maharashtra","Andhra Pradesh, Odisha, Telangana, Karnataka and Maharashtra","Tamil Nadu, Telangana, Kerala, Maharashtra and Gujarat"], answer:0},
+
+{q:"The AI-powered multilingual conversational platform ‘bob SAMVAD’ was unveiled by which senior government official?", options:["Ajay Seth, Secretary, DEA","Sanjay Malhotra, RBI Governor","M. Nagaraju, Secretary, Department of Financial Services (DFS)","Vivek Joshi, Election Commissioner"], answer:2},
+
+{q:"Which of the following is the correct tagline associated with Bank of Baroda (BoB)?", options:["We Understand Your World","India's International Bank","Good People to Bank With","Apno Ka Bank"], answer:1},
+
+{q:"Canara HSBC Life Insurance Company Limited recently launched a next-generation Unit Linked Insurance Plan (ULIP) designed to combine wealth creation and insurance protection. What is the name of this plan?", options:["Wealth Builder Pro","Promise4Life","Promise4Wealth","Future Wealth Plus"], answer:2},
+
+{q:"A key customer-friendly feature highlighted under Canara HSBC Life Insurance’s ‘Promise4Wealth’ ULIP is:", options:["Guaranteed maturity amount","Free critical illness cover","Zero premium allocation charge","Loyalty addition from first year"], answer:2},
+
+{q:"The investment option under Canara HSBC Life Insurance’s ‘Promise4Wealth’ plan is linked to which benchmark index?", options:["Nifty Alpha 50 Index","BSE 500 Enhanced Value 50 Index","Nifty 100 Equal Weight Index","BSE Sensex Next 50 Index"], answer:1},
+
+{q:"Which of the following is NOT one of the variants offered under the ‘Promise4Wealth’ ULIP?", options:["Promise4Wealth Maximiser","Promise4Wealth Shield","Promise4Wealth Long Life","Promise4Wealth Assured"], answer:3},
+
+{q:"DBS Bank India launched ‘DBS Aspire Banking’, a relationship-led banking proposition aimed at serving which customer segment?", options:["Rural entrepreneurs","Students and first-time earners","Emerging affluent customers","MSME exporters"], answer:2},
+
+{q:"Under DBS Aspire Banking, customers become eligible if they maintain a relationship value of at least:", options:["₹5 lakh","₹7 lakh","₹10 lakh","₹15 lakh"], answer:2},
+
+{q:"Apart from relationship value criteria, DBS Aspire Banking is also available to customers maintaining a monthly average savings account balance of at least:", options:["₹1 lakh","₹1.5 lakh","₹2 lakh","₹3 lakh"], answer:2},
+
+{q:"DBS Aspire Banking specifically aims to cater to the digital and financial requirements of:", options:["Small traders and retailers","High-Net-Worth Individuals (HNWIs) and Ultra-HNWIs","Government pensioners","Rural self-help groups"], answer:1},
+
+{q:"Which of the following benefits is offered under DBS Aspire Banking?", options:["4% interest on all savings balances","Free Demat account for life","0% charges on banking transactions and services","Complimentary foreign exchange card"], answer:2},
+
+{q:"NPCI Bharat BillPay Limited (NBBL) recently expanded its Banking Connect platform by onboarding which private sector bank?", options:["Federal Bank","Axis Bank","IndusInd Bank","RBL Bank"], answer:1},
+
+{q:"Following the onboarding of Axis Bank, Banking Connect customers can make payments across more than how many merchants connected to the platform?", options:["3,500","4,000","4,800","5,500"], answer:2},
+
+{q:"NPCI Bharat BillPay Limited (NBBL) was established in:", options:["2018","2019","2020","2021"], answer:2},
+
+{q:"CSB Bank Limited launched its first dedicated retail savings product under which name?", options:["PRIME SAVE ACCOUNT","SMART SAVE ACCOUNT","SMART PLUS ACCOUNT","EASY BANK ACCOUNT"], answer:1},
+
+{q:"The SMART SAVE ACCOUNT introduced by CSB Bank includes an auto-sweep facility that transfers surplus funds into:", options:["Mutual Funds","Government Bonds","Fixed Deposits (FDs)","Recurring Deposits"], answer:2},
+
+{q:"Under CSB Bank’s SMART SAVE ACCOUNT, the maximum interest rate available on Sweep-in Fixed Deposits (FDs) with a 13-month tenure is:", options:["6.50%","6.75%","7.00%","7.25%"], answer:2},
+
+{q:"Which of the following account categories is available under CSB Bank’s SMART SAVE ACCOUNT proposition?", options:["NRO Variant","PMJDY Variant","Escrow Variant","Institutional Variant"], answer:0},
+
+{q:"One of the notable features of CSB Bank’s SMART SAVE ACCOUNT is a daily ATM withdrawal limit of:", options:["₹50,000","₹60,000","₹75,000","₹1,00,000"], answer:2},
+
+{q:"Paytm recently introduced biometric authentication for UPI payments and cardless ATM withdrawals. This move coincides with RBI’s new:", options:["Digital Lending Rules","Tokenisation Framework","Two-Factor Authentication (2FA) Rules","Account Aggregator Regulations"], answer:2},
+
+{q:"The biometric authentication feature introduced by Paytm enables users to perform which activity without manually entering the UPI PIN?", options:["Opening fixed deposits","Authenticating payments and checking balances","Applying for personal loans","Linking Aadhaar with bank account"], answer:1},
+
+{q:"Under Paytm’s newly launched biometric-enabled ATM service, the limit for cardless ATM withdrawals per transaction is:", options:["₹5,000","₹7,500","₹10,000","₹15,000"], answer:2},
+
+{q:"Visa, in collaboration with HDFC Bank Limited, launched a FIFA-themed digital credit card ahead of the FIFA World Cup 2026. What is the name of the card?", options:["FIFA Rewards Credit Card","FIFA World Cup 2026 Pixel Credit Card","Pixel Sports Credit Card","FIFA Platinum Credit Card"], answer:1},
+
+{q:"The FIFA World Cup 2026 Pixel Credit Card launched by Visa and HDFC Bank is available through which application?", options:["SmartBuy","HDFC Bank App","PayZapp","MyCards"], answer:2},
+
+{q:"Which spending-linked rewards campaign was launched alongside the FIFA World Cup 2026 Pixel Credit Card?", options:["Swipe & Win","Spend & Win","Shop & Score","Earn & Travel"], answer:1},
+
+{q:"The Directorate General of Foreign Trade (DGFT) has authorised 17 banks to import precious metals for the period:", options:["April 2025–March 2028","April 2026–March 2029","April 2027–March 2030","April 2024–March 2027"], answer:1},
+
+{q:"Which two banks have been permitted by DGFT to import only gold, while the remaining authorised banks can import both gold and silver?", options:["SBI and Bank of India","Union Bank of India and SBER Bank","Indian Bank and Canara Bank","PNB and UCO Bank"], answer:1},
+
+{q:"The DGFT amendments relating to precious metal imports have been made under which policy framework?", options:["Foreign Trade Policy (FTP) 2023","National Logistics Policy","Gold Monetisation Scheme","Make in India Trade Framework"], answer:0},
+
+{q:"NPCI, through BHIM Services, has partnered with which credit information company to enable users to check their credit scores directly within the BHIM UPI application?", options:["Experian India","Equifax India","CRIF High Mark","TransUnion CIBIL"], answer:3},
+
+{q:"The newly introduced CIBIL score-check feature is available on BHIM UPI app version:", options:["3.9.10 and above","4.0.19 and above","4.1.15 and above","5.0.19 and above"], answer:1},
+
+{q:"Through the BHIM–CIBIL integration, users can directly access which document within the BHIM application?", options:["Annual Financial Report","Credit Information Report (CIR)","Banking Relationship Statement","Digital Credit Certificate"], answer:1},
+
+{q:"BHIM UPI currently supports transactions and services in more than how many Indian languages?", options:["10","12","15","20"], answer:2},
+
+{q:"BSE Index Services recently launched the BSE Housing Finance Index. The primary objective of this index is to:", options:["Track performance of housing finance companies","Track performance of infrastructure companies","Measure affordable housing projects","Benchmark real estate developers"], answer:0},
+
+{q:"The BSE Housing Finance Index is derived from the constituents of which broader market index?", options:["BSE Sensex","BSE 500","BSE 100","BSE 1000"], answer:3},
+
+{q:"The BSE Housing Finance Index is intended to serve as a benchmark for products such as:", options:["Sovereign Gold Bonds only","ETFs, Index Funds and PMS portfolios","Corporate Bond Funds only","REITs exclusively"], answer:1},
+
+{q:"The BSE Housing Finance Index will undergo reconstitution at which frequency?", options:["Quarterly in March, June, September and December","Monthly","Semi-annually in June and December","Annually in December only"], answer:2},
+
+{q:"State Bank of India (SBI) has announced an ambitious target to expand its balance sheet to what percentage of India's Gross Domestic Product (GDP) by the year 2030?", options:["22%","23%","25%","28%"], answer:2},
+
+{q:"According to SBI's latest strategic roadmap, its balance sheet currently stands at approximately what percentage of India's GDP?", options:["16%","18%","20%","22%"], answer:2},
+
+{q:"As part of its growth strategy, SBI aims to increase its market share across how many districts of India?", options:["650 districts","700 districts","750 districts","800 districts"], answer:3},
+
+{q:"SBI's balance sheet stood at approximately what amount as of December 2025?", options:["₹65.42 lakh crore","₹68.55 lakh crore","₹71.62 lakh crore","₹75.10 lakh crore"], answer:2},
+
+{q:"According to SBI's disclosure, its total business reached which of the following levels?", options:["₹95.24 lakh crore","₹99.87 lakh crore","₹103.29 lakh crore","₹108.15 lakh crore"], answer:2},
+
+{q:"Punjab National Bank (PNB) partnered with Kiwi platform primarily to introduce which innovative payment solution?", options:["UPI Lite Wallet","Credit-enabled UPI Payments","CBDC Retail Payments","International QR Payments"], answer:1},
+
+{q:"Under its partnership with Kiwi, Punjab National Bank (PNB) plans to launch which card product on the RuPay network?", options:["PNB Digital Card","PNB UPI Platinum Card","PNB Kiwi Credit Card","PNB One Credit Card"], answer:2},
+
+{q:"Which of the following is a key feature of the proposed PNB Kiwi Credit Card?", options:["Physical onboarding only","Forex-linked rewards","Fully digital onboarding and cashback benefits","Free airport lounge access worldwide"], answer:2},
+
+{q:"Which organization projected bank credit growth in India at 11%–11.7% for FY27?", options:["CRISIL Ratings","CARE Ratings","ICRA","India Ratings"], answer:2},
+
+{q:"According to ICRA, the estimated bank credit growth during FY26 stood at:", options:["13.2%","14.4%","15.9%","16.8%"], answer:2},
+
+{q:"ICRA expects Gross Non-Performing Assets (GNPA) of the banking sector to remain in which range during FY27?", options:["1.5%–1.7%","1.8%–1.9%","2.0%–2.1%","2.4%–2.5%"], answer:2},
+
+{q:"According to ICRA's projections, India's real GDP growth for FY27 is expected to be:", options:["6.0%","6.2%","6.5%","6.8%"], answer:2},
+
+{q:"ICRA has projected Return on Assets (RoA) for the banking sector in FY27 in which range?", options:["0.8%–1.0%","1.0%–1.1%","1.2%–1.3%","1.4%–1.5%"], answer:2},
+
+{q:"Which of the following Return on Equity (RoE) ranges has been projected by ICRA for Indian banks in FY27?", options:["10.5%–11.5%","11.5%–12.0%","12.3%–13.2%","13.8%–14.5%"], answer:2},
+
+{q:"Abu Dhabi National Insurance Company (ADNIC) has received approval to operate a reinsurance branch in India at:", options:["Mumbai International Financial Centre","IFSC, GIFT City, Gandhinagar","NSE IFSC, Ahmedabad","Special Economic Zone, Surat"], answer:1},
+
+{q:"The reinsurance branch licence granted to ADNIC became effective from:", options:["1 January 2026","1 April 2026","1 July 2026","1 October 2026"], answer:1},
+
+{q:"ADNIC stands for:", options:["Abu Dhabi National Insurance Corporation","Abu Dhabi New Insurance Company","Abu Dhabi National Insurance Company","Arabian Dhabi National Insurance Company"], answer:2},
+
+{q:"Gujarat International Finance Tec-City (GIFT City), where ADNIC's reinsurance branch will operate, is located in:", options:["Ahmedabad","Surat","Vadodara","Gandhinagar"], answer:3},
+
+{q:"Karnataka Bank has partnered with Pine Labs primarily to strengthen which aspect of banking services?", options:["Agricultural Lending","PoS-based Digital Payment Ecosystem","International Trade Finance","Wealth Management Services"], answer:1},
+
+{q:"The partnership between Karnataka Bank and Pine Labs will particularly focus on which customer segments?", options:["Government Institutions and PSUs","Corporate Borrowers only","Retail and MSME Customers","NRI Customers"], answer:2},
+
+{q:"Karnataka Bank stated that the Pine Labs partnership aligns with its vision of:", options:["Banking Beyond Borders","Digital India First","Digital Bank of the Future","Smart Banking Mission"], answer:2},
+
+{q:"NPCI Bharat BillPay Limited (NBBL) recently onboarded which insurance provider as a biller on the Bharat Connect platform?", options:["Life Insurance Corporation of India","India Post Payments Insurance","Postal Life Insurance (PLI)","National Insurance Company"], answer:2},
+
+{q:"Postal Life Insurance (PLI) has been onboarded under which category on Bharat Connect?", options:["Pension Services","Insurance Category","Government Services","Utility Payments"], answer:1},
+
+{q:"With the addition of Postal Life Insurance (PLI), Bharat Connect now has how many insurance billers?", options:["50","55","65","75"], answer:2},
+
+{q:"Which bank acted as the Biller Operating Unit (BOU) for onboarding Postal Life Insurance (PLI) onto Bharat Connect?", options:["Punjab National Bank","Bank of Baroda","State Bank of India","Canara Bank"], answer:2},
+
+{q:"Razorpay recently integrated with Google Pay to facilitate:", options:["Domestic UPI Mandates","International Cross-Border Payments","CBDC Transactions","Aadhaar-enabled Payments"], answer:1},
+
+{q:"Following its partnership with Google Pay, Razorpay became the first Indian payment aggregator to offer:", options:["NFC-based UPI Payments","QR-based International Settlements","Card-based Wallet Experience for Cross-Border Payments","CBDC-linked Merchant Payments"], answer:2},
+
+{q:"Razorpay currently operates under which RBI licence category for its payment aggregation business?", options:["PA-UPI Licence","PA-CB Licence","PPI Licence","BBPOU Licence"], answer:1},
+
+{q:"Pay Point India became the first private fintech company to receive direct membership in RBI's:", options:["Bharat Bill Payment System","Unified Payments Interface","Centralised Payment System (CPS)","Account Aggregator Network"], answer:2},
+
+{q:"Through direct membership in RBI's Centralised Payment System (CPS), Pay Point India gained direct access to which two payment systems?", options:["UPI and IMPS","RTGS and NEFT","BBPS and NACH","AEPS and UPI"], answer:1},
+
+{q:"A major benefit received by Pay Point India after joining RBI's CPS was:", options:["Digital Banking Licence","White-label ATM Authorisation","Its Own IFSC Code","Payment Bank Status"], answer:2},
+
+{q:"The Government of India extended the tenure of Rajneesh Karnatak as Managing Director & CEO of which public sector bank?", options:["Punjab National Bank","Bank of Maharashtra","Bank of India","Indian Overseas Bank"], answer:2},
+
+{q:"Rajneesh Karnatak's tenure extension as MD & CEO of Bank of India became effective from:", options:["1 January 2026","29 April 2026","1 July 2026","15 August 2026"], answer:1},
+
+{q:"Debadatta Chand's tenure as Managing Director & CEO of Bank of Baroda (BoB) has been extended for a further period of:", options:["1 year","2 years","3 years","5 years"], answer:2},
+
+{q:"From which date does Debadatta Chand's extended tenure as MD & CEO of Bank of Baroda become effective?", options:["29 April 2026","1 July 2026","1 October 2026","1 January 2027"], answer:1},
+
+{q:"Which Executive Director of Indian Bank also received a tenure extension from the Government?", options:["K. Satyanarayana Raju","Ashutosh Choudhary","Shanti Lal Jain","Binod Kumar"], answer:1},
+
+{q:"Jio Financial Services Limited (JFSL) and Allianz Group have entered into a binding agreement to establish an insurance joint venture with what ownership structure?", options:["51:49","60:40","74:26","50:50"], answer:3},
+
+{q:"The proposed JFSL–Allianz joint venture will primarily focus on which insurance segments?", options:["Life and Reinsurance","Marine and Aviation","General Insurance and Health Insurance","Crop and Livestock Insurance"], answer:2},
+
+{q:"The partnership between Jio Financial Services Limited (JFSL) and Allianz Group was first announced in:", options:["January 2025","April 2025","July 2025","December 2025"], answer:2},
+
+{q:"The JFSL–Allianz insurance joint venture aims to support India's broader vision of:", options:["Financial Inclusion by 2030","Digital India 2040","Insurance for All by 2047","Viksit Bharat by 2035"], answer:2},
+
+{q:"The Reserve Bank of India (RBI) recently approved a Non-Banking Financial Company (NBFC) licence for One MobiKwik Systems Ltd. Under which entity will MobiKwik undertake its lending operations?", options:["MobiKwik Capital Services Ltd.","MobiKwik Financial Services Pvt Ltd.","MobiKwik Credit Finance Ltd.","One Mobi Finance Pvt Ltd."], answer:1},
+
+{q:"The newly approved NBFC arm of MobiKwik will primarily focus on offering:", options:["Only gold-backed loans","Only housing loans","Secured and unsecured loans","Agricultural loans only"], answer:2},
+
+{q:"MobiKwik's lending strategy under its new NBFC licence is primarily targeted toward:", options:["Metro-city corporates only","Consumers and small businesses in Tier-2 and Tier-3 cities","Government employees only","Export-oriented industries"], answer:1},
+
+{q:"One MobiKwik Systems Ltd., which recently received RBI approval for an NBFC licence, was established in:", options:["2007","2008","2009","2010"], answer:2},
+
+{q:"India approved the first withdrawal of ₹3,000 crore for Maldives under which framework?", options:["BIMSTEC Currency Settlement Mechanism","SAARC Currency Swap Framework (2024–27)","Asian Clearing Union Settlement Facility","BRICS Local Currency Arrangement"], answer:1},
+
+{q:"The agreement enabling the first withdrawal under the SAARC Currency Swap Framework was signed between RBI and:", options:["Ministry of Finance, Maldives","Bank of Maldives","Maldives Monetary Authority","Maldives Development Bank"], answer:2},
+
+{q:"Under the SAARC Currency Swap Framework (2024–27), the INR Swap Window corpus has been fixed at:", options:["₹150 billion","₹200 billion","₹250 billion","₹300 billion"], answer:2},
+
+{q:"SAARC, under whose currency swap framework the Maldives withdrawal was approved, was established in:", options:["1983","1985","1987","1990"], answer:1},
+
+{q:"Tata AIA Life Insurance recently launched a unit-linked life insurance plan named 'Shubh Health Criti'. This plan provides coverage for more than how many critical illnesses?", options:["40","50","60","75"], answer:2},
+
+{q:"One of the distinguishing features of Tata AIA's 'Shubh Health Criti' plan is a premium guarantee extending up to:", options:["20 years","25 years","30 years","35 years"], answer:2},
+
+{q:"Which benefit under Tata AIA's 'Shubh Health Criti' plan allows policyholders to access funds without tax liability for medical needs?", options:["Loyalty additions","Tax-free withdrawals for medical expenses","Premium holiday benefit","Guaranteed surrender value"], answer:1},
+
+{q:"Tata AIA Life Insurance is a joint venture between Tata Sons and:", options:["Prudential plc","Allianz Group","AIA Group","Sun Life Financial"], answer:2},
+
+{q:"India Post Payments Bank (IPPB) launched a dedicated SHG Savings Account primarily to promote financial inclusion among:", options:["Farmer Producer Organisations (FPOs)","Women-led Self Help Groups (SHGs)","Urban Cooperative Societies","MSME Clusters"], answer:1},
+
+{q:"Which of the following features is associated with the SHG Savings Account launched by India Post Payments Bank (IPPB)?", options:["Mandatory minimum balance of ₹5,000","Quarterly interest payout","Annual maintenance charges","Maximum balance of ₹5 lakh"], answer:1},
+
+{q:"Under the SHG Savings Account of IPPB, the maximum balance that can be maintained is:", options:["₹1 lakh","₹1.5 lakh","₹2 lakh","₹5 lakh"], answer:2},
+
+{q:"India Post Payments Bank (IPPB) functions under which government department?", options:["Department of Financial Services","Department of Economic Affairs","Department of Posts","Department of Telecommunications"], answer:2},
+
+{q:"Self Help Groups (SHGs) in India are primarily promoted by:", options:["SIDBI","NABARD","EXIM Bank","NHB"], answer:1},
+
+{q:"Unified Payments Interface (UPI) recently completed how many years since its launch in 2016?", options:["8 years","9 years","10 years","11 years"], answer:2},
+
+{q:"During FY26, UPI recorded approximately how many transactions?", options:["18,420 crore","20,835 crore","24,161 crore","27,500 crore"], answer:2},
+
+{q:"The transaction value processed through UPI during FY26 stood at approximately:", options:["₹214 lakh crore","₹264 lakh crore","₹314 lakh crore","₹364 lakh crore"], answer:2},
+
+{q:"Since its launch, UPI transaction volume has grown by approximately:", options:["5,000 times","8,000 times","10,000 times","12,000 times"], answer:3},
+
+{q:"According to recent data, UPI accounts for approximately what share of India's digital payment transactions?", options:["65%","75%","85%","95%"], answer:2},
+
+{q:"UPI currently contributes nearly what percentage of global real-time payment transactions?", options:["29%","39%","49%","59%"], answer:2},
+
+{q:"How many banks are currently live on the UPI ecosystem?", options:["503","603","703","803"], answer:2},
+
+{q:"UPI services are currently available across how many countries?", options:["5","6","8","10"], answer:2},
+
+{q:"The Government of India expanded recruitment in Public Sector Banks (PSBs) by adding how many candidates during FY26?", options:["30,827","37,860","45,210","50,552"], answer:3},
+
+{q:"Recruitment for Public Sector Banks is primarily conducted through which organization?", options:["RBI Services Board","NABARD Recruitment Cell","IBPS","BFSI Skill Council"], answer:2},
+
+{q:"IBPS originally began operations in 1975 as:", options:["Banking Recruitment Board","Personnel Selection Services (PSS)","Institute of Public Banking Studies","National Banking Assessment Service"], answer:1},
+
+{q:"Flipkart, Axis Bank and PayU recently introduced a biometric authentication solution for card payments that replaces:", options:["CVV verification","PIN verification","OTP authentication","Tokenisation"], answer:2},
+
+{q:"The biometric card payment system launched by Flipkart, Axis Bank and PayU enables transactions to be completed in approximately:", options:["2 seconds","5 seconds","10 seconds","15 seconds"], answer:0},
+
+{q:"Which of the following benefits is specifically highlighted for the OTP-free biometric payment solution?", options:["Lower interchange fee","Improved security and higher success rate","Unlimited transaction value","Reduced GST on payments"], answer:1},
+
+{q:"The Asian Development Bank (ADB) recently unveiled a connectivity roadmap for Asia-Pacific with a total investment outlay of:", options:["USD 50 billion","USD 60 billion","USD 70 billion","USD 80 billion"], answer:2},
+
+{q:"Under ADB's connectivity plan, how much investment has been earmarked for the Power Grid Initiative?", options:["USD 20 billion","USD 30 billion","USD 40 billion","USD 50 billion"], answer:3},
+
+{q:"The Power Grid Initiative under ADB's plan aims to integrate how much renewable energy capacity?", options:["10 GW","15 GW","20 GW","25 GW"], answer:2},
+
+{q:"The Digital Highway Initiative announced by ADB carries an investment commitment of:", options:["USD 10 billion","USD 15 billion","USD 20 billion","USD 25 billion"], answer:2},
+
+{q:"As part of the Digital Highway Initiative, an AI Innovation Centre is proposed to be established in:", options:["Tokyo","Singapore","Seoul","Bangkok"], answer:2},
+
+{q:"The Department of Financial Services (DFS) approved Viability Plan 2.0 for Regional Rural Banks (RRBs) covering which period?", options:["FY24–FY26","FY25–FY27","FY25–FY28","FY26–FY29"], answer:2},
+
+{q:"Viability Plan 2.0 for RRBs is built around how many performance parameters?", options:["20","25","30","35"], answer:2},
+
+{q:"Which of the following is NOT one of the four pillars under Viability Plan 2.0 for Regional Rural Banks?", options:["Operational Excellence","Asset Quality","Profitability","Export Competitiveness"], answer:3},
+
+{q:"Viability Plan 2.0 approved by DFS applies to how many Regional Rural Banks (RRBs) across India?", options:["24","26","28","30"], answer:2},
+
+];
+
+// ===============================
+// VARIABLES
+// ===============================
+
+let userAnswers = new Array(questions.length).fill(null);
+
+let markedForReview = new Array(questions.length).fill(false);
+
+let submitted = false;
+
+// ===============================
+// LOAD QUIZ
+// ===============================
+
+function loadQuiz(){
+
+    const quizDiv = document.getElementById("quiz");
+
+    questions.forEach((question,index)=>{
+
+        const qDiv = document.createElement("div");
+
+        qDiv.classList.add("question");
+
+        qDiv.id = `question_${index}`;
+
+        qDiv.innerHTML = `
+        <h3>Q${index+1}. ${question.q}</h3>
+        `;
+
+        question.options.forEach((option,optIndex)=>{
+
+            const opt = document.createElement("div");
+
+            opt.classList.add("option");
+
+            opt.innerText = option;
+
+            opt.onclick = ()=>selectOption(index,optIndex,opt);
+
+            opt.id = `q${index}_opt${optIndex}`;
+
+            qDiv.appendChild(opt);
+
+        });
+
+        // MARK BUTTON
+
+        const markBtn = document.createElement("button");
+
+        markBtn.innerText = "Mark For Review";
+
+        markBtn.classList.add("mark-btn");
+
+        markBtn.onclick = ()=>toggleMark(index,markBtn);
+
+        qDiv.appendChild(markBtn);
+
+        // CLEAR BUTTON
+
+        const clearBtn = document.createElement("button");
+
+        clearBtn.innerText = "Clear";
+
+        clearBtn.classList.add("clear-btn");
+
+        clearBtn.onclick = ()=>clearAnswer(index);
+
+        qDiv.appendChild(clearBtn);
+
+        quizDiv.appendChild(qDiv);
+
+    });
+
+}
+
+// ===============================
+// SELECT OPTION
+// ===============================
+
+function selectOption(qIndex,optIndex,element){
+
+    if(submitted) return;
+
+    userAnswers[qIndex] = optIndex;
+
+    const options = document.querySelectorAll(`[id^="q${qIndex}_opt"]`);
+
+    options.forEach(opt=>{
+        opt.classList.remove("selected");
+    });
+
+    element.classList.add("selected");
+
+}
+
+// ===============================
+// MARK FOR REVIEW
+// ===============================
+
+function toggleMark(index,button){
+
+    markedForReview[index] = !markedForReview[index];
+
+    const questionBox = document.getElementById(`question_${index}`);
+
+    if(markedForReview[index]){
+
+        button.classList.add("marked");
+
+        button.innerText = "Marked For Review";
+
+        questionBox.classList.add("review-marked");
+
+    }else{
+
+        button.classList.remove("marked");
+
+        button.innerText = "Mark For Review";
+
+        questionBox.classList.remove("review-marked");
+
+    }
+
+}
+
+// ===============================
+// CLEAR ANSWER
+// ===============================
+
+function clearAnswer(index){
+
+    if(submitted) return;
+
+    userAnswers[index] = null;
+
+    const options = document.querySelectorAll(`[id^="q${index}_opt"]`);
+
+    options.forEach(opt=>{
+        opt.classList.remove("selected");
+    });
+
+}
+
+// ===============================
+// SUBMIT QUIZ
+// ===============================
+
+function submitQuiz(){
+
+    if(submitted) return;
+
+    submitted = true;
+
+    clearInterval(timer);
+
+    let score = 0;
+
+    let correctCount = 0;
+    let wrongCount = 0;
+    let unansweredCount = 0;
+
+    questions.forEach((question,index)=>{
+
+        const userAns = userAnswers[index];
+
+        if(userAns === null){
+
+            unansweredCount++;
+
+        }
+        else if(userAns === question.answer){
+
+            score += 1;
+            correctCount++;
+
+        }
+        else{
+
+            score -= 0.25;
+            wrongCount++;
+
+        }
+
+    });
+
+    let attempted = correctCount + wrongCount;
+
+    let accuracy = attempted > 0
+    ? ((correctCount/attempted)*100).toFixed(2)
+    : 0;
+
+    document.body.innerHTML = `
+
+    <div class="container">
+
+        <div class="result-box">
+
+            <h1>Quiz Submitted ✅</h1>
+
+            <h2>Total Score: ${score.toFixed(2)}</h2>
+
+            <h3>Correct Answers: ${correctCount}</h3>
+
+            <h3>Wrong Answers: ${wrongCount}</h3>
+
+            <h3>Unanswered Questions: ${unansweredCount}</h3>
+
+            <h3>Accuracy: ${accuracy}%</h3>
+
+            <button class="review-btn" onclick="reviewAnswers()">
+            Review Answers
+            </button>
+
+            <div id="reviewSection"></div>
+
+        </div>
+
+    </div>
+
+    `;
+
+}
+
+// ===============================
+// REVIEW ANSWERS
+// ===============================
+
+function reviewAnswers(){
+
+    const reviewSection = document.getElementById("reviewSection");
+
+    let html = `<h1 style="margin-top:40px;">Review Section</h1>`;
+
+    questions.forEach((question,index)=>{
+
+        const userAns = userAnswers[index];
+
+        let status = "";
+        let marks = "";
+
+        if(userAns === null){
+
+            status = `<span class="unanswered">Unanswered</span>`;
+            marks = `0 Marks`;
+
+        }
+        else if(userAns === question.answer){
+
+            status = `<span class="correct">Correct ✅</span>`;
+            marks = `+1 Mark`;
+
+        }
+        else{
+
+            status = `<span class="wrong">Wrong ❌</span>`;
+            marks = `-0.25 Mark`;
+
+        }
+
+        html += `
+
+        <div class="review-question">
+
+            <h3>Q${index+1}. ${question.q}</h3>
+
+            <p>${status}</p>
+
+            <p><b>Marks:</b> ${marks}</p>
+
+            <p>
+            <b>Your Answer:</b>
+            ${
+                userAns === null
+                ? "Not Attempted"
+                : question.options[userAns]
+            }
+            </p>
+
+            <div class="correct-answer">
+            <b>Correct Answer:</b>
+            ${question.options[question.answer]}
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+    reviewSection.innerHTML = html;
+
+}
+
+// ===============================
+// TIMER
+// ===============================
+
+let time = 1800;
+
+let timer;
+
+let isPaused = false;
+
+function startTimer(){
+
+    timer = setInterval(()=>{
+
+        if(!isPaused){
+
+            let minutes = Math.floor(time/60);
+
+            let seconds = time%60;
+
+            document.getElementById("timer").innerText =
+            `Time Left: ${minutes}:${seconds < 10 ? '0'+seconds : seconds}`;
+
+            time--;
+
+            if(time < 0){
+
+                clearInterval(timer);
+
+                alert("Time is up! Quiz auto-submitted.");
+
+                submitQuiz();
+
+            }
+
+        }
+
+    },1000);
+
+}
+
+// ===============================
+// PAUSE TIMER
+// ===============================
+
+function pauseTimer(){
+
+    if(submitted) return;
+
+    isPaused = true;
+
+    document.getElementById("pauseBtn").disabled = true;
+
+    document.getElementById("resumeBtn").disabled = false;
+
+    // Disable options
+    document.querySelectorAll(".option").forEach(opt=>{
+        opt.classList.add("disabled-option");
+    });
+
+    // Disable buttons
+    document.querySelectorAll(".mark-btn, .clear-btn").forEach(btn=>{
+        btn.disabled = true;
+        btn.classList.add("disabled-btn");
+    });
+
+}
+// ===============================
+// RESUME TIMER
+// ===============================
+
+function resumeTimer(){
+
+    if(submitted) return;
+
+    isPaused = false;
+
+    document.getElementById("pauseBtn").disabled = false;
+
+    document.getElementById("resumeBtn").disabled = true;
+
+    // Enable options
+    document.querySelectorAll(".option").forEach(opt=>{
+        opt.classList.remove("disabled-option");
+    });
+
+    // Enable buttons
+    document.querySelectorAll(".mark-btn, .clear-btn").forEach(btn=>{
+        btn.disabled = false;
+        btn.classList.remove("disabled-btn");
+    });
+
+}
+// ===============================
+
+loadQuiz();
+
+startTimer();
+
+</script>
+
+</body>
+</html>
